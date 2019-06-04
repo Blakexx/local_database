@@ -38,7 +38,7 @@ database["dir1/b/0"] = 100;
 
 To read from the database, use the [] operator. The parameter of this operator is the path in the database to put to delimited by forward slashes ("/").
 
-```data
+```dart
 print(database["dir1"]);
 print(database["dir1/b/0"]);
 ```
