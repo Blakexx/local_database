@@ -7,7 +7,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  local_database: "^1.0.0"
+  local_database: ^1.0.0+1
 ```
 
 In your library add the following import:
