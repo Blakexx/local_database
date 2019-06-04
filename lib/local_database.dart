@@ -6,7 +6,6 @@ import "package:path_provider/path_provider.dart";
 
 class Database{
 
-
   Directory _base;
 
   Database(String b){

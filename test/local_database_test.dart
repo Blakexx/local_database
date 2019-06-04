@@ -5,11 +5,11 @@ import "package:local_database/local_database.dart";
 void main(){
   String home = "";
   Map<String, String> envVars = Platform.environment;
-  if(Platform.isMacOS) {
+  if(Platform.isMacOS){
     home = envVars['HOME'];
-  }else if(Platform.isLinux) {
+  }else if(Platform.isLinux){
     home = envVars['HOME'];
-  }else if(Platform.isWindows) {
+  }else if(Platform.isWindows){
     home = envVars['UserProfile'];
   }else{
     throw new Exception("Unknown platform");
