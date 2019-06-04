@@ -14,18 +14,6 @@ class Database {
     _base = new Directory(b)..createSync(recursive: true);
   }
 
-  ///Create a Database from the application documents directory
-  static Future<Database> fromApplicationDocumentsDirectory(
-      [String name]) async {
-    name = name == null ? "data" : name;
-    String delim = Platform.pathSeparator;
-    assert(!name.contains(delim));
-    return new Future<Database>(() async {
-      String base = (await getApplicationDocumentsDirectory()).path;
-      return new Database("$base$delim$name");
-    });
-  }
-
   ///Return the Database's path
   String get path => _base.path;
 

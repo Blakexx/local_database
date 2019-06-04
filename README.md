@@ -54,7 +54,7 @@ For mobile applications, to create a database from the phone's application docum
 The following is an example use of the package:
 
 ```dart
-Database database = Database.fromApplicationDocumentsDirectory();
+Database database = new Database(Directory.current+"/data");
 Map<String,dynamic> userData;
 if(database["userData"]==null){
 	String userId = "";
