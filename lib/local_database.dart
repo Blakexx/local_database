@@ -2,13 +2,25 @@ library local_database;
 
 import "dart:io";
 import "dart:convert";
+import "package:path_provider/path_provider.dart";
 
 class Database{
 
   Directory _base;
 
   Database(String b){
+    assert(b!=null);
     _base = new Directory(b)..createSync(recursive: true);
+  }
+
+  static Future<Database> fromAppDirectory([String name]) async{
+    name = name==null?"data":name;
+    String delim = Platform.pathSeparator;
+    assert(!name.contains(delim));
+    return new Future<Database>(() async{
+      String base = (await getApplicationDocumentsDirectory()).path;
+      return new Database("$base$delim$name");
+    });
   }
 
   String get path => _base.path;
@@ -16,6 +28,7 @@ class Database{
   String _delim = Platform.pathSeparator;
 
   operator []=(String path, dynamic data){
+    assert(path!=null);
     path = _fixPath(path);
     String s;
     try{
@@ -44,6 +57,7 @@ class Database{
   }
 
   operator [](String path){
+    assert(path!=null);
     path = _fixPath(path);
     dynamic f = new File(_base.path+path);
     if(!f.existsSync()){
@@ -152,6 +166,7 @@ class Database{
   }
 
   dynamic remove(String path){
+    assert(path!=null);
     path = _fixPath(path);
     dynamic data = this[path];
     dynamic f = new File(_base.path+path);

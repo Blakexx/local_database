@@ -1,8 +1,8 @@
 name: local_database
 description: A local database using dart:io filesytem components
 version: 0.0.1
-author:
-homepage:
+author: Blakexx
+homepage: https://github.com/Blakexx/Local-Database
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
+  path_provider:
 
 dev_dependencies:
   flutter_test:
