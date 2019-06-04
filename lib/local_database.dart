@@ -13,7 +13,7 @@ class Database{
     _base = new Directory(b)..createSync(recursive: true);
   }
 
-  static Future<Database> fromAppDirectory([String name]) async{
+  static Future<Database> fromApplicationDocumentsDirectory([String name]) async{
     name = name==null?"data":name;
     String delim = Platform.pathSeparator;
     assert(!name.contains(delim));
