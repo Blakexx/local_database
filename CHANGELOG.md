@@ -1,3 +1,7 @@
+## [1.0.1+1]
+
+* Fixed a bug with getting from root when it is empty
+
 ## [1.0.1]
 
 * Removed static method `fromApplicationDocumentsDirectory`

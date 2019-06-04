@@ -2,7 +2,6 @@ library local_database;
 
 import "dart:io";
 import "dart:convert";
-import "package:path_provider/path_provider.dart";
 
 ///A dart:io based Database
 class Database {
@@ -180,7 +179,7 @@ class Database {
         break;
       }
     }
-    return allInts && sequential;
+    return map.keys.length>0 && allInts && sequential;
   }
 
   ///Fix the provided paths
