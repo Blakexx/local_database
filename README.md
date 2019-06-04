@@ -29,7 +29,7 @@ To use the database, simply instantiate it with the constructor
 Next, call the built in methods for database.
 
 To put into the database, use the []= operator (note that only JSON encodable types can be used). The parameter of this operator is the path in the database to put to delimited by forward slashes ("/").
-```
+```dart
 database["dir1"] = {
 	"b":[1,2,3]
 };
@@ -38,20 +38,22 @@ database["dir1/b/0"] = 100;
 
 To read from the database, use the [] operator. The parameter of this operator is the path in the database to put to delimited by forward slashes ("/").
 
-```
+```database
 print(database["dir1"]);
 print(database["dir1/b/0"]);
 ```
 
 To remove from the database, use the .remove(String path) method. The parameter of this operator is the path in the database to put to delimited by forward slashes ("/").
 
-`database.remove("dir1");`
+```dart
+database.remove("dir1");
+``
 
 For mobile applications, to create a database from the phone's application documents directory, use the `Database.fromApplicationDocumentsDirectory([String name])` method. This will return a Database that has automatically been created there.
 
 The following is an example use of the package:
 
-```
+```dart
 Database database = Database.fromApplicationDocumentsDirectory();
 Map<String,dynamic> userData;
 if(database["userData"]==null){
