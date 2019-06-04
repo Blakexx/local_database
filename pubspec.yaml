@@ -1,5 +1,5 @@
 name: local_database
-description: A local database using dart:io filesytem components
+description: A local database using dart:io file system components
 version: 0.0.1
 author: Blakexx
 homepage: https://github.com/Blakexx/Local-Database
