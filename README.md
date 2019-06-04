@@ -47,7 +47,7 @@ To remove from the database, use the .remove(String path) method. The parameter 
 
 ```dart
 database.remove("dir1");
-``
+```
 
 For mobile applications, to create a database from the phone's application documents directory, use the `Database.fromApplicationDocumentsDirectory([String name])` method. This will return a Database that has automatically been created there.
 
