@@ -179,7 +179,7 @@ class Database {
         break;
       }
     }
-    return map.keys.length>0 && allInts && sequential;
+    return map.keys.length > 0 && allInts && sequential;
   }
 
   ///Fix the provided paths
