@@ -60,7 +60,7 @@ if(database["userData"]==null){
 	String userId = "";
 	Random r = new Random();
 	for(int i = 0; i<8;i++){
-		userId+=r.nextInt(10);
+		userId+=r.nextInt(10).toString();
 	}
 	database["userData"] = {
 		"created": (new DateTime.now()).millisecondsSinceEpoch,
