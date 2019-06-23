@@ -7,7 +7,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  local_database: ^1.0.1+2
+  local_database: ^1.0.1+3
 ```
 
 In your library add the following import:
@@ -36,7 +36,7 @@ database["dir1"] = {
 database["dir1/b/0"] = 100;
 ```
 
-To read from the database, use the [] operator. The parameter of this operator is the path in the database to put to delimited by forward slashes ("/").
+To read from the database, use the [] operator. The parameter of this operator is the path in the database to read from delimited by forward slashes ("/").
 
 ```dart
 print(database["dir1"]);

@@ -1,3 +1,7 @@
+## 1.0.1+3
+
+* Fixed a typo in readme
+
 ## 1.0.1+2
 
 * Fixed changelog
