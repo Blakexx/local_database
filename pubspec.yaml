@@ -1,6 +1,6 @@
 name: local_database
 description: A local database using dart:io file system components. Comes with put, get, and remove functionality.
-version: 1.0.1+3
+version: 1.0.1+4
 author: "Blake Bottum <blake@platypuslabs.llc>"
 homepage: https://github.com/Blakexx/local_database
 

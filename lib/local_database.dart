@@ -140,7 +140,7 @@ class Database {
     return list;
   }
 
-  //Recursively convert all potential Maps into Lists
+  ///Recursively convert all potential Maps into Lists
   void _convertAllLists(Map map, dynamic parentMap, dynamic key) {
     if (_isList(map)) {
       if (parentMap != null) {

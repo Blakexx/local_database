@@ -7,7 +7,7 @@ In the `pubspec.yaml` of your flutter project, add the following dependency:
 ```yaml
 dependencies:
   ...
-  local_database: ^1.0.1+3
+  local_database: ^1.0.1+4
 ```
 
 In your library add the following import:
@@ -49,12 +49,10 @@ To remove from the database, use the .remove(String path) method. The parameter 
 database.remove("dir1");
 ```
 
-For mobile applications, to create a database from the phone's application documents directory, use the `Database.fromApplicationDocumentsDirectory([String name])` method. This will return a Database that has automatically been created there.
-
 The following is an example use of the package:
 
 ```dart
-Database database = new Database(Directory.current+"/data");
+Database database = new Database(Directory.current.path+"/data");
 Map<String,dynamic> userData;
 if(database["userData"]==null){
 	String userId = "";
