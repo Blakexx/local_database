@@ -1,7 +1,7 @@
 import "dart:io";
 import "package:local_database/local_database.dart";
 
-void main(){
+void main() async{
   String home = "";
   Map<String, String> envVars = Platform.environment;
   if(Platform.isMacOS){
@@ -27,14 +27,15 @@ void main(){
   //Put a single string into path /dir2/f
   database["dir2/f"] = "Data";
   //Read from /dir1
-  print(database["dir1"]);
+  print(await database["dir1"]);
   //Read from /dir1/a/0
-  print(database["dir1/a/0"]);
+  print(await database["dir1/a/0"]);
   //Read the entire database
-  print(database["/"]);
+  print(await database["/"]);
   //Read a nonexistent element
-  print(database["nonexistant"]);
+  print(await database["nonexistant"]);
   //Remove from the database
-  print(database.remove("dir1"));
+  database.remove("dir1");
+  print(await database["dir1"]);
   new Directory(home+"/data")..deleteSync(recursive: true);
 }

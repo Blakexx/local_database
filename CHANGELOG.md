@@ -1,3 +1,8 @@
+## 1.1.0
+
+* Reading is now asynchronous
+* Removing now returns void
+
 ## 1.0.1+4
 
 * Readme fixes

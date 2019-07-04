@@ -51,7 +51,7 @@ class Database {
   }
 
   ///Get from the Database
-  operator [](String path) {
+  Future<dynamic> operator [](String path) async {
     assert(path != null);
     path = _fixPath(path);
     dynamic f = new File(_base.path + path);
@@ -64,30 +64,30 @@ class Database {
       if (f is Directory) {
         Map<String, dynamic> map = new Map<String, dynamic>();
         List<dynamic> files = f.listSync(recursive: true);
-        files.forEach((d) {
-          if (d is Directory) {
-            return;
-          }
-          String path = d.path;
-          path = path.substring(f.path.length);
-          path = _fixPath(path);
-          if (Platform.isMacOS && path.split(_delim).last == ".DS_Store") {
-            return;
-          }
-          List<String> paths = path.split(_delim);
-          paths.removeAt(0);
-          String last = paths.removeLast();
-          Map<String, dynamic> temp = map;
-          paths.forEach((s) {
-            if (temp[s] != null) {
-              temp = temp[s];
-            } else {
-              temp[s] = new Map<String, dynamic>();
-              temp = temp[s];
-            }
-          });
-          temp[last] = json.decode(d.readAsStringSync());
-        });
+        await Future.wait(files.map((d) => new Future<Null>(() {
+              if (d is Directory) {
+                return;
+              }
+              String path = d.path;
+              path = path.substring(f.path.length);
+              path = _fixPath(path);
+              if (Platform.isMacOS && path.split(_delim).last == ".DS_Store") {
+                return;
+              }
+              List<String> paths = path.split(_delim);
+              paths.removeAt(0);
+              String last = paths.removeLast();
+              Map<String, dynamic> temp = map;
+              paths.forEach((s) {
+                if (temp[s] != null) {
+                  temp = temp[s];
+                } else {
+                  temp[s] = new Map<String, dynamic>();
+                  temp = temp[s];
+                }
+              });
+              temp[last] = json.decode(d.readAsStringSync());
+            })));
         _convertAllLists(map, null, null);
         if (_isList(map)) {
           return _mapToList(map);
@@ -101,10 +101,9 @@ class Database {
   }
 
   ///Remove from the database
-  dynamic remove(String path) {
+  void remove(String path) async {
     assert(path != null);
     path = _fixPath(path);
-    dynamic data = this[path];
     dynamic f = new File(_base.path + path);
     if (f.existsSync()) {
       Directory parent = f.parent;
@@ -127,7 +126,6 @@ class Database {
     if (path == _delim) {
       _base.createSync();
     }
-    return data;
   }
 
   ///Convert a Map to a List
@@ -190,6 +188,9 @@ class Database {
     }
     if (path.length > 2 && path.endsWith(_delim)) {
       path = path.substring(0, path.length - 1);
+    }
+    if(new RegExp(r"/{2,}").allMatches(path).length>0){
+      throw new Exception("Invalid path");
     }
     return path;
   }
