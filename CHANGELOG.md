@@ -1,3 +1,7 @@
+## 1.1.0+1
+
+* Fixed typos
+
 ## 1.1.0
 
 * Reading is now asynchronous

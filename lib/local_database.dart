@@ -19,7 +19,7 @@ class Database {
   String _delim = Platform.pathSeparator;
 
   ///Put into the Database
-  operator []=(String path, dynamic data) {
+  void operator []=(String path, dynamic data) {
     assert(path != null);
     path = _fixPath(path);
     String s;
@@ -79,12 +79,10 @@ class Database {
               String last = paths.removeLast();
               Map<String, dynamic> temp = map;
               paths.forEach((s) {
-                if (temp[s] != null) {
-                  temp = temp[s];
-                } else {
+                if (temp[s] == null) {
                   temp[s] = new Map<String, dynamic>();
-                  temp = temp[s];
                 }
+                temp = temp[s];
               });
               temp[last] = json.decode(d.readAsStringSync());
             })));
@@ -189,7 +187,7 @@ class Database {
     if (path.length > 2 && path.endsWith(_delim)) {
       path = path.substring(0, path.length - 1);
     }
-    if(new RegExp(r"/{2,}").allMatches(path).length>0){
+    if (new RegExp(r"/{2,}").allMatches(path).length > 0) {
       throw new Exception("Invalid path");
     }
     return path;
