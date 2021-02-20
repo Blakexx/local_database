@@ -27,12 +27,12 @@ void main() {
     };
     database["dir2/f"] = "Data";
     expect((await database["dir1"]).toString(),
-        "{a: [1, 2, 3], d: [1, 2, {e: 5}], b: {c: 5}}");
+        "{a: [1, 2, 3], b: {c: 5}, d: [1, 2, {e: 5}]}");
     expect(await database["dir1/a/0"], 1);
     expect((await database["/"]).toString(),
-        "{dir2: {f: Data}, dir1: {a: [1, 2, 3], d: [1, 2, {e: 5}], b: {c: 5}}}");
+        "{dir1: {a: [1, 2, 3], b: {c: 5}, d: [1, 2, {e: 5}]}, dir2: {f: Data}}");
     expect(await database["nonexistant"], null);
-    database.remove("dir1");
+    await database.remove("dir1");
     expect((await database["dir1"]).toString(), "null");
     new Directory(home + "/data")..deleteSync(recursive: true);
   });

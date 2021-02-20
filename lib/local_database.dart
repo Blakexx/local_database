@@ -2,15 +2,19 @@ library local_database;
 
 import "dart:io";
 import "dart:convert";
+import "dart:async";
+import "package:queue/queue.dart";
 
 ///A dart:io based Database
 class Database {
   Directory _base;
+  Queue _queue;
 
   ///Create a Database with path b
   Database(String b) {
     assert(b != null);
-    _base = new Directory(b)..createSync(recursive: true);
+    _base = Directory(b)..create(recursive: true);
+    _queue = Queue();
   }
 
   ///Return the Database's path
@@ -18,117 +22,138 @@ class Database {
 
   String _delim = Platform.pathSeparator;
 
-  ///Put into the Database
-  void operator []=(String path, dynamic data) {
-    assert(path != null);
+  Future<void> _set(String path, dynamic data) async {
     path = _fixPath(path);
     String s;
     try {
       s = json.encode(data);
     } catch (e) {
-      throw new Exception("Invalid data (not json encodable)");
+      throw Exception("Invalid data (not json encodable)");
     }
-    remove(path);
     if (data is List) {
       List l = data;
-      data = new Map<String, dynamic>();
+      data = Map<String, dynamic>();
       l.asMap().forEach((i, d) => data[i.toString()] = d);
     }
     if (data is Map) {
-      data.forEach((k, v) => this[path == _delim ? path + k : "$path/$k"] = v);
+      await Future.wait(data.keys
+          .map((k) => Future<void>(() async {
+                await _set(path == _delim ? path + k : "$path/$k", data[k]);
+              }))
+          .toList()
+          .cast<Future<void>>());
     } else {
-      if (data == null || data == "") {
-        remove(path);
-      } else {
+      if (data != null && data != "") {
         if (path == _delim) {
-          throw new Exception("Invalid Path (cannot write to root)");
+          throw Exception("Invalid Path (cannot write to root)");
         }
-        new File(_base.path + path)
-          ..createSync(recursive: true)
-          ..writeAsStringSync(s);
+        File f = File(_base.path + path);
+        await f.create(recursive: true);
+        await f.writeAsString(s);
       }
     }
+  }
+
+  ///Put into the Database
+  void operator []=(String path, dynamic data) {
+    assert(path != null);
+    _queue.add(() async {
+      await _remove(path);
+      await _set(path, data);
+    });
   }
 
   ///Get from the Database
   Future<dynamic> operator [](String path) async {
     assert(path != null);
-    path = _fixPath(path);
-    dynamic f = new File(_base.path + path);
-    if (!f.existsSync()) {
-      f = new Directory(_base.path + path);
-    }
-    if (!f.existsSync()) {
-      return null;
-    } else {
-      if (f is Directory) {
-        Map<String, dynamic> map = new Map<String, dynamic>();
-        List<dynamic> files = f.listSync(recursive: true);
-        await Future.wait(files.map((d) => new Future<Null>(() {
-              if (d is Directory) {
-                return;
-              }
-              String path = d.path;
-              path = path.substring(f.path.length);
-              path = _fixPath(path);
-              if (Platform.isMacOS && path.split(_delim).last == ".DS_Store") {
-                return;
-              }
-              List<String> paths = path.split(_delim);
-              paths.removeAt(0);
-              String last = paths.removeLast();
-              Map<String, dynamic> temp = map;
-              paths.forEach((s) {
-                if (temp[s] == null) {
-                  temp[s] = new Map<String, dynamic>();
-                }
-                temp = temp[s];
-              });
-              temp[last] = json.decode(d.readAsStringSync());
-            })));
-        _convertAllLists(map, null, null);
-        if (_isList(map)) {
-          return _mapToList(map);
-        }
-        return map;
-      } else {
-        String data = f.readAsStringSync();
-        return json.decode(data);
+    return await _queue.add(() async {
+      path = _fixPath(path);
+      dynamic f = File(_base.path + path);
+      if (!f.existsSync()) {
+        f = Directory(_base.path + path);
       }
-    }
+      if (!(await f.exists())) {
+        return null;
+      } else {
+        if (f is Directory) {
+          Map<String, dynamic> map = Map<String, dynamic>();
+          dynamic files = await f.list(recursive: true);
+          files = await files.toList();
+          await Future.wait(files
+              .map((d) => Future<void>(() async {
+                    if (d is Directory) {
+                      return;
+                    }
+                    String path = d.path;
+                    path = path.substring(f.path.length);
+                    path = _fixPath(path);
+                    if (Platform.isMacOS &&
+                        path.split(_delim).last == ".DS_Store") {
+                      return;
+                    }
+                    List<String> paths = path.split(_delim);
+                    paths.removeAt(0);
+                    String last = paths.removeLast();
+                    Map<String, dynamic> temp = map;
+                    paths.forEach((s) {
+                      if (temp[s] == null) {
+                        temp[s] = Map<String, dynamic>();
+                      }
+                      temp = temp[s];
+                    });
+                    temp[last] = json.decode(await d.readAsString());
+                  }))
+              .toList()
+              .cast<Future<dynamic>>());
+          _convertAllLists(map, null, null);
+          if (_isList(map)) {
+            return _mapToList(map);
+          }
+          return map;
+        } else {
+          return json.decode(await f.readAsString());
+        }
+      }
+    });
   }
 
-  ///Remove from the database
-  void remove(String path) async {
-    assert(path != null);
+  Future<void> _remove(String path) async {
     path = _fixPath(path);
-    dynamic f = new File(_base.path + path);
+    dynamic f = File(_base.path + path);
     if (f.existsSync()) {
       Directory parent = f.parent;
       f.deleteSync(recursive: true);
       while (parent.path != _base.path && parent.listSync().length == 0) {
-        parent.deleteSync(recursive: true);
+        await parent.delete(recursive: true);
         parent = parent.parent;
       }
     } else {
-      f = new Directory(_base.path + path);
+      f = Directory(_base.path + path);
       if (f.existsSync()) {
         Directory parent = f.parent;
-        f.deleteSync(recursive: true);
+        await f.delete(recursive: true);
         while (parent.path != _base.path && parent.listSync().length == 0) {
-          parent.deleteSync(recursive: true);
+          await parent.delete(recursive: true);
           parent = parent.parent;
         }
       }
     }
     if (path == _delim) {
-      _base.createSync();
+      await _base.create();
     }
+  }
+
+  ///Remove from the database
+  Future<void> remove(String path) async {
+    assert(path != null);
+    await _queue.add(() async {
+      await _remove(path);
+    });
   }
 
   ///Convert a Map to a List
   List<dynamic> _mapToList(Map<String, dynamic> map) {
-    List<dynamic> list = new List<dynamic>();
+    List<dynamic> list = [];
     list.length = map.length;
     for (int i = 0; i < list.length; i++) {
       list[i] = map[i.toString()];
@@ -167,7 +192,7 @@ class Database {
   ///Check if a Map is a List
   bool _isList(Map map) {
     dynamic keys = map.keys;
-    bool allInts = keys.every((s) => new RegExp("\\d+").hasMatch(s));
+    bool allInts = keys.every((s) => RegExp("\\d+").hasMatch(s));
     bool sequential = true;
     for (int i = 0; i < keys.length; i++) {
       if (!keys.contains("$i")) {
@@ -187,8 +212,8 @@ class Database {
     if (path.length > 2 && path.endsWith(_delim)) {
       path = path.substring(0, path.length - 1);
     }
-    if (new RegExp(r"/{2,}").allMatches(path).length > 0) {
-      throw new Exception("Invalid path");
+    if (RegExp(r"/{2,}").allMatches(path).length > 0) {
+      throw Exception("Invalid path");
     }
     return path;
   }

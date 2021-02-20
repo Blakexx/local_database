@@ -1,3 +1,7 @@
+## 1.2.0
+
+* Added queue system for queries
+
 ## 1.1.0+1
 
 * Fixed typos
